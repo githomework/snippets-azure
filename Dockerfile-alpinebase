@@ -1,0 +1,25 @@
+FROM alpine:latest
+RUN apk update && \
+    apk add --no-cache tzdata && \
+        apk add --no-cache openrc && \
+    apk add --no-cache openssh && \
+    mkdir /app
+VOLUME /sys/fs/cgroup
+ENV SSH_PASSWD "root:Docker!"
+RUN echo "$SSH_PASSWD" | chpasswd
+COPY sshd_config /etc/ssh/
+COPY init.sh /usr/local/bin/
+RUN chmod u+x /usr/local/bin/init.sh  && \
+    rc-update add sshd  && \
+    rc-status  && \
+    touch /run/openrc/softlevel  && \
+    service sshd checkconfig
+EXPOSE 8000 2222
+
+
+
+
+
+=======================================
+in start up .sh file do
+/usr/sbin/sshd
